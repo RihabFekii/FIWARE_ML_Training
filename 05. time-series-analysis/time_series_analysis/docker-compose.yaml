@@ -1,0 +1,57 @@
+services:
+  mongodb:
+    image: mongo:4.4
+    hostname: mongodb
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    networks:
+      - fiware_network
+
+  orion:
+    platform: linux/amd64
+    image: quay.io/fiware/orion-ld:1.8.0
+    hostname: orion
+    container_name: fiware-orion
+    depends_on:
+      - mongodb
+    ports:
+      - "1026:1026"
+    command: -dbhost mongodb
+    networks:
+      - fiware_network
+    healthcheck:
+      test: curl --fail -s http://orion:1026/version || exit 1
+      interval: 10s
+  timescaledb:
+    image: timescale/timescaledb:latest-pg14
+    container_name: timescaledb
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=tsdb
+      - POSTGRES_USER=tsdbuser
+      - POSTGRES_PASSWORD=tsdbpassword
+    volumes:
+      - timescale-data:/var/lib/postgresql/data
+    networks:
+      - fiware_network
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - fiware_network
+
+networks:
+  fiware_network:
+    driver: bridge
+
+volumes:
+  timescale-data:
+  grafana-data:
