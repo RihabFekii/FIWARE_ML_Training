@@ -1,0 +1,10 @@
+{
+    "city": "Hamburg",
+    "osm_api_url": "https://nominatim.openstreetmap.org/search?q={city}&format=json&limit=1",
+    "context_broker_url": "http://localhost:1026/v2/entities",
+    "context_broker_headers": {
+        "Content-Type": "application/json",
+        "Fiware-Service": "openstreetmap",
+        "Fiware-ServicePath": "/data"
+    }
+}
