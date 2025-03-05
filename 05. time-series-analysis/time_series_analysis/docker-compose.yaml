@@ -26,6 +26,7 @@ services:
   timescaledb:
     image: timescale/timescaledb:latest-pg14
     container_name: timescaledb
+    hostname: timescaledb
     ports:
       - "5432:5432"
     environment:
@@ -36,6 +37,22 @@ services:
       - timescale-data:/var/lib/postgresql/data
     networks:
       - fiware_network
+  quantumleap:
+    image: orchestracities/quantumleap:latest
+    container_name: quantumleap
+    hostname: quantumleap
+    ports:
+      - "8668:8668"
+    depends_on:
+      - timescaledb
+    environment:
+      - POSTGRES_HOST=timescaledb
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB_NAME=tsdb
+      - POSTGRES_DB_USER=tsdbuser
+      - POSTGRES_DB_PASS=tsdbpassword
+    networks:
+    - fiware_network
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
