@@ -197,3 +197,18 @@ curl -X GET 'http://localhost:1026/v2/subscriptions' \
 -H 'Fiware-ServicePath: /'
 ```
 
+## ML model training and inference 
+
+### Archirecture 
+
+![Training_Inference_Architecture](docs/Architecture-training_inference.png)
+
+The above architecture shows the following processes: 
+
+- **The ML training process:** Since we setted up the subscription to persist the new upcoming data in the database. After having enough historical data, we can use it to train the ML model (forecast model). The extraction of the training data is done with a timestamp interval. since we want to keep track of the metadata of the trained model, this infrmation is saved in the contact broker in the entity of ML_model. This entity stores also the version of the data model, the timeframe of the training and other relevent information. 
+
+- **The inference process:** After training the ML model, a python service for the inference process is deployed as a docker image and pulled from a docker registry service to be used for the inference process. Everytime there is a new training process of a new model, a CI/CD pipeline is executed to package and push the new model and service image to the docker registry. The inference process uses the same infrastructure of getting the data from the OpenWeatherMap API and the foreasts are stored in the database.
+
+- **Model performence:** Since the ML model does the forecasts and these results are stored in the database, when we get the real data, we can evaluat the model performence using the predicted and real data and this way, we can make sure to train the ML model to get the best results and catch drift efficiently. 
+
+
